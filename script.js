@@ -69,205 +69,111 @@ document.addEventListener('DOMContentLoaded', () => {
         easing: 'easeOutExpo'
     });
 
-    // Rose animation
-    const rose = document.querySelector('.rose');
-    const petals = document.querySelectorAll('.petal');
-
-    // Create petals dynamically
-    const petalCount = 17;
-    rose.innerHTML = '';
-    for (let i = 0; i < petalCount; i++) {
-        const petal = document.createElement('div');
-        petal.className = 'petal';
-        rose.appendChild(petal);
-    }
-
-    // Initial petal animation
+    // Enhanced rose animation with staggered petal effects
+    anime({
+        targets: '.rose',
+        scale: [0.9, 1],
+        opacity: [0.8, 1],
+        duration: 3000,
+        loop: true,
+        direction: 'alternate',
+        easing: 'easeInOutSine'
+    });
+    
+    // Staggered petals animation
     anime({
         targets: '.petal',
-        scale: [
-            { value: 0, duration: 0 },
-            { value: 1, duration: 2000, delay: anime.stagger(100) }
-        ],
-        rotate: [
-            { value: '45deg', duration: 0 },
-            { value: '+=45deg', duration: 2000, delay: anime.stagger(100) }
-        ],
-        translateX: [
-            { value: 0, duration: 0 },
-            { value: anime.stagger([-20, 20]), duration: 2000 }
-        ],
-        translateY: [
-            { value: 0, duration: 0 },
-            { value: anime.stagger([-20, 20]), duration: 2000 }
-        ],
-        opacity: [
-            { value: 0, duration: 0 },
-            { value: 1, duration: 2000, delay: anime.stagger(100) }
-        ],
-        easing: 'easeOutElastic(1, .6)',
-        complete: function(anim) {
-            // Start continuous rotation after initial animation
+        scale: function() { return 1 + (anime.random(0, 10) / 100); },
+        translateZ: function() { return anime.random(5, 15); },
+        opacity: [0.9, 1],
+        duration: function() { return anime.random(2000, 4000); },
+        delay: anime.stagger(100, {from: 'center'}),
+        loop: true,
+        direction: 'alternate',
+        easing: 'easeInOutSine'
+    });
+    
+    // Create subtle sparkle particles around the rose
+    const createSparkles = () => {
+        const roseContainer = document.querySelector('.rose-container');
+        const roseRect = roseContainer.getBoundingClientRect();
+        
+        for (let i = 0; i < 15; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.cssText = `
+                position: absolute;
+                width: ${anime.random(2, 4)}px;
+                height: ${anime.random(2, 4)}px;
+                background: rgba(255, 255, 255, ${anime.random(0.1, 0.3)});
+                border-radius: 50%;
+                pointer-events: none;
+                top: ${anime.random(20, 80)}%;
+                left: ${anime.random(20, 80)}%;
+                z-index: 50;
+            `;
+            roseContainer.appendChild(sparkle);
+            
+            // Animate each sparkle
             anime({
-                targets: '.rose',
-                rotateY: [0, 360],
-                duration: 20000,
-                easing: 'linear',
-                loop: true
+                targets: sparkle,
+                opacity: [0, 0.8, 0],
+                translateX: anime.random(-20, 20),
+                translateY: anime.random(-20, 20),
+                scale: [1, anime.random(1.5, 2.5), 0.5],
+                duration: anime.random(3000, 6000),
+                easing: 'easeOutExpo',
+                complete: function(anim) {
+                    sparkle.remove();
+                    if (document.querySelector('.rose-container')) {
+                        createSparkle();
+                    }
+                }
             });
         }
-    });
-
-    // Continuous floating animation for the rose container
-    anime({
-        targets: '.rose-container',
-        translateY: [
-            { value: -15, duration: 1500 },
-            { value: 0, duration: 1500 }
-        ],
-        easing: 'easeInOutQuad',
-        loop: true,
-        direction: 'alternate'
-    });
-
-    // Hover effect for petals
-    petals.forEach(petal => {
-        petal.addEventListener('mouseenter', () => {
-            anime({
-                targets: petal,
-                scale: 1.2,
-                rotate: '+=45deg',
-                duration: 800,
-                easing: 'easeOutElastic(1, .6)'
-            });
-        });
-
-        petal.addEventListener('mouseleave', () => {
-            anime({
-                targets: petal,
-                scale: 1,
-                rotate: '-=45deg',
-                duration: 500,
-                easing: 'easeOutQuad'
-            });
-        });
-    });
-
-    // Button hover animation
-    const ctaButton = document.querySelector('.cta-button');
-    ctaButton.addEventListener('mouseenter', () => {
-        anime({
-            targets: ctaButton,
-            scale: 1.1,
-            duration: 400,
-            easing: 'easeOutQuad'
-        });
-    });
-
-    ctaButton.addEventListener('mouseleave', () => {
-        anime({
-            targets: ctaButton,
-            scale: 1,
-            duration: 400,
-            easing: 'easeOutQuad'
-        });
-    });
-
-    // Testimonial cards animation with Intersection Observer
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
     };
-
-    const testimonialObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                anime({
-                    targets: entry.target,
-                    opacity: [0, 1],
-                    translateY: [20, 0],
-                    duration: 800,
-                    easing: 'easeOutExpo'
-                });
-                testimonialObserver.unobserve(entry.target);
+    
+    // Create a single new sparkle to replace one that finished
+    const createSparkle = () => {
+        const roseContainer = document.querySelector('.rose-container');
+        if (!roseContainer) return;
+        
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.cssText = `
+            position: absolute;
+            width: ${anime.random(2, 4)}px;
+            height: ${anime.random(2, 4)}px;
+            background: rgba(255, 255, 255, ${anime.random(0.1, 0.3)});
+            border-radius: 50%;
+            pointer-events: none;
+            top: ${anime.random(20, 80)}%;
+            left: ${anime.random(20, 80)}%;
+            z-index: 50;
+        `;
+        roseContainer.appendChild(sparkle);
+        
+        // Animate each sparkle
+        anime({
+            targets: sparkle,
+            opacity: [0, 0.8, 0],
+            translateX: anime.random(-20, 20),
+            translateY: anime.random(-20, 20),
+            scale: [1, anime.random(1.5, 2.5), 0.5],
+            duration: anime.random(3000, 6000),
+            easing: 'easeOutExpo',
+            complete: function(anim) {
+                sparkle.remove();
+                if (document.querySelector('.rose-container')) {
+                    createSparkle();
+                }
             }
         });
-    }, observerOptions);
-
-    testimonialCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            testimonialObserver.observe(card);
-        }, index * 100);
-
-        // Add hover effect
-        card.addEventListener('mouseenter', () => {
-            anime({
-                targets: card,
-                scale: 1.05,
-                boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
-                duration: 300,
-                easing: 'easeOutQuad'
-            });
-        });
-
-        card.addEventListener('mouseleave', () => {
-            anime({
-                targets: card,
-                scale: 1,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                duration: 300,
-                easing: 'easeOutQuad'
-            });
-        });
-    });
-
-    // Background particles
-    const createParticles = () => {
-        const container = document.createElement('div');
-        container.className = 'particles-container';
-        container.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        `;
-        document.body.appendChild(container);
-
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.cssText = `
-                position: absolute;
-                width: 2px;
-                height: 2px;
-                background: rgba(255, 255, 255, ${Math.random() * 0.15});
-                border-radius: 50%;
-                left: ${Math.random() * 100}vw;
-                top: ${Math.random() * 100}vh;
-            `;
-            container.appendChild(particle);
-
-            anime({
-                targets: particle,
-                translateX: () => anime.random(-100, 100),
-                translateY: () => anime.random(-100, 100),
-                opacity: [0, 0.15, 0],
-                duration: anime.random(4000, 7000),
-                loop: true,
-                easing: 'easeInOutSine',
-                delay: anime.random(0, 2000)
-            });
-        }
     };
-
-    createParticles();
-
+    
+    // Initialize sparkles
+    createSparkles();
+    
     // Footer animations
     anime({
         targets: '.footer-logo, .footer-brand',
@@ -327,6 +233,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 300,
                 easing: 'easeOutQuad'
             });
+        });
+    });
+
+    // Testimonial cards animation
+    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const testimonialObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                anime({
+                    targets: entry.target,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 800,
+                    easing: 'easeOutExpo'
+                });
+                testimonialObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    testimonialCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            testimonialObserver.observe(card);
+        }, index * 100);
+    });
+
+    // Background particles
+    const particles = [];
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.cssText = `
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, ${Math.random() * 0.15});
+            border-radius: 50%;
+            left: ${Math.random() * 100}vw;
+            top: ${Math.random() * 100}vh;
+            pointer-events: none;
+        `;
+        document.body.appendChild(particle);
+        particles.push(particle);
+    }
+
+    // Particle animations
+    particles.forEach(particle => {
+        anime({
+            targets: particle,
+            translateX: function() {
+                return anime.random(-100, 100);
+            },
+            translateY: function() {
+                return anime.random(-100, 100);
+            },
+            opacity: [0, 0.15, 0],
+            duration: anime.random(4000, 7000),
+            loop: true,
+            easing: 'easeInOutSine',
+            delay: anime.random(0, 2000)
+        });
+    });
+
+    // Button hover effect
+    const button = document.querySelector('.cta-button');
+    button.addEventListener('mouseenter', () => {
+        anime({
+            targets: button,
+            scale: 1.05,
+            duration: 300,
+            easing: 'easeOutExpo'
+        });
+    });
+
+    button.addEventListener('mouseleave', () => {
+        anime({
+            targets: button,
+            scale: 1,
+            duration: 300,
+            easing: 'easeOutExpo'
         });
     });
 }); 

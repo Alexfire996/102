@@ -1,16 +1,26 @@
 #!/bin/bash
 
-# Clean dist directory
-rm -rf dist
+# Create dist directory
 mkdir -p dist
+mkdir -p dist/assets/images
+mkdir -p dist/css
+mkdir -p dist/js
 
-# Copy necessary files
+# Copy HTML files
 cp index.html dist/
-cp styles.css dist/
-cp script.js dist/
-cp -r assets dist/ 2>/dev/null || true
 
-# Ensure proper permissions
-chmod -R 755 dist
+# Copy CSS files
+cp styles.css dist/css/
+cp *.css dist/css/
+
+# Copy JavaScript files
+cp script.js dist/js/
+cp -r lib dist/js/
+
+# Copy images
+cp -r assets/images/* dist/assets/images/
+
+# Copy any other assets
+cp -r assets/* dist/assets/ 2>/dev/null || true
 
 echo "Build completed successfully!" 
