@@ -69,111 +69,164 @@ document.addEventListener('DOMContentLoaded', () => {
         easing: 'easeOutExpo'
     });
 
-    // Enhanced rose animation with staggered petal effects
-    anime({
-        targets: '.rose',
-        scale: [0.9, 1],
-        opacity: [0.8, 1],
-        duration: 3000,
-        loop: true,
-        direction: 'alternate',
-        easing: 'easeInOutSine'
-    });
-    
-    // Staggered petals animation
+    // Rose animation
+    const rose = document.querySelector('.rose');
+    const petals = document.querySelectorAll('.petal');
+
+    // Initial petal animation
     anime({
         targets: '.petal',
-        scale: function() { return 1 + (anime.random(0, 10) / 100); },
-        translateZ: function() { return anime.random(5, 15); },
-        opacity: [0.9, 1],
-        duration: function() { return anime.random(2000, 4000); },
-        delay: anime.stagger(100, {from: 'center'}),
-        loop: true,
-        direction: 'alternate',
-        easing: 'easeInOutSine'
+        scale: [
+            { value: 0, duration: 0 },
+            { value: 1, duration: 2000, delay: anime.stagger(100) }
+        ],
+        rotate: [
+            { value: '45deg', duration: 0 },
+            { value: '+=45deg', duration: 2000, delay: anime.stagger(100) }
+        ],
+        translateX: [
+            { value: 0, duration: 0 },
+            { value: anime.stagger([-20, 20]), duration: 2000 }
+        ],
+        translateY: [
+            { value: 0, duration: 0 },
+            { value: anime.stagger([-20, 20]), duration: 2000 }
+        ],
+        opacity: [
+            { value: 0, duration: 0 },
+            { value: 1, duration: 2000, delay: anime.stagger(100) }
+        ],
+        easing: 'easeOutElastic(1, .6)',
+        loop: false
     });
-    
-    // Create subtle sparkle particles around the rose
-    const createSparkles = () => {
-        const roseContainer = document.querySelector('.rose-container');
-        const roseRect = roseContainer.getBoundingClientRect();
-        
-        for (let i = 0; i < 15; i++) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
-            sparkle.style.cssText = `
-                position: absolute;
-                width: ${anime.random(2, 4)}px;
-                height: ${anime.random(2, 4)}px;
-                background: rgba(255, 255, 255, ${anime.random(0.1, 0.3)});
-                border-radius: 50%;
-                pointer-events: none;
-                top: ${anime.random(20, 80)}%;
-                left: ${anime.random(20, 80)}%;
-                z-index: 50;
-            `;
-            roseContainer.appendChild(sparkle);
-            
-            // Animate each sparkle
+
+    // Continuous floating animation for the rose container
+    anime({
+        targets: '.rose-container',
+        translateY: [
+            { value: -15, duration: 1500 },
+            { value: 0, duration: 1500 }
+        ],
+        easing: 'easeInOutQuad',
+        loop: true,
+        direction: 'alternate'
+    });
+
+    // Hover effect for petals
+    petals.forEach(petal => {
+        petal.addEventListener('mouseenter', () => {
             anime({
-                targets: sparkle,
-                opacity: [0, 0.8, 0],
-                translateX: anime.random(-20, 20),
-                translateY: anime.random(-20, 20),
-                scale: [1, anime.random(1.5, 2.5), 0.5],
-                duration: anime.random(3000, 6000),
-                easing: 'easeOutExpo',
-                complete: function(anim) {
-                    sparkle.remove();
-                    if (document.querySelector('.rose-container')) {
-                        createSparkle();
-                    }
-                }
+                targets: petal,
+                scale: 1.2,
+                rotate: '+=45deg',
+                duration: 800,
+                easing: 'easeOutElastic(1, .6)'
             });
-        }
-    };
-    
-    // Create a single new sparkle to replace one that finished
-    const createSparkle = () => {
-        const roseContainer = document.querySelector('.rose-container');
-        if (!roseContainer) return;
-        
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        sparkle.style.cssText = `
-            position: absolute;
-            width: ${anime.random(2, 4)}px;
-            height: ${anime.random(2, 4)}px;
-            background: rgba(255, 255, 255, ${anime.random(0.1, 0.3)});
-            border-radius: 50%;
-            pointer-events: none;
-            top: ${anime.random(20, 80)}%;
-            left: ${anime.random(20, 80)}%;
-            z-index: 50;
-        `;
-        roseContainer.appendChild(sparkle);
-        
-        // Animate each sparkle
-        anime({
-            targets: sparkle,
-            opacity: [0, 0.8, 0],
-            translateX: anime.random(-20, 20),
-            translateY: anime.random(-20, 20),
-            scale: [1, anime.random(1.5, 2.5), 0.5],
-            duration: anime.random(3000, 6000),
-            easing: 'easeOutExpo',
-            complete: function(anim) {
-                sparkle.remove();
-                if (document.querySelector('.rose-container')) {
-                    createSparkle();
-                }
-            }
         });
-    };
-    
-    // Initialize sparkles
-    createSparkles();
-    
+
+        petal.addEventListener('mouseleave', () => {
+            anime({
+                targets: petal,
+                scale: 1,
+                rotate: '-=45deg',
+                duration: 500,
+                easing: 'easeOutQuad'
+            });
+        });
+    });
+
+    // Button hover animation
+    const ctaButton = document.querySelector('.cta-button');
+    ctaButton.addEventListener('mouseenter', () => {
+        anime({
+            targets: ctaButton,
+            scale: 1.1,
+            duration: 400,
+            easing: 'easeOutQuad'
+        });
+    });
+
+    ctaButton.addEventListener('mouseleave', () => {
+        anime({
+            targets: ctaButton,
+            scale: 1,
+            duration: 400,
+            easing: 'easeOutQuad'
+        });
+    });
+
+    // Testimonial cards animation
+    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    testimonialCards.forEach((card, index) => {
+        // Initial fade in
+        anime({
+            targets: card,
+            opacity: [0, 1],
+            translateY: [50, 0],
+            duration: 1000,
+            delay: 500 + (index * 200),
+            easing: 'easeOutQuad'
+        });
+
+        // Hover effect
+        card.addEventListener('mouseenter', () => {
+            anime({
+                targets: card,
+                scale: 1.05,
+                boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        });
+
+        card.addEventListener('mouseleave', () => {
+            anime({
+                targets: card,
+                scale: 1,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        });
+    });
+
+    // Background particles
+    const particles = [];
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.cssText = `
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, ${Math.random() * 0.15});
+            border-radius: 50%;
+            left: ${Math.random() * 100}vw;
+            top: ${Math.random() * 100}vh;
+            pointer-events: none;
+        `;
+        document.body.appendChild(particle);
+        particles.push(particle);
+    }
+
+    // Particle animations
+    particles.forEach(particle => {
+        anime({
+            targets: particle,
+            translateX: function() {
+                return anime.random(-100, 100);
+            },
+            translateY: function() {
+                return anime.random(-100, 100);
+            },
+            opacity: [0, 0.15, 0],
+            duration: anime.random(4000, 7000),
+            loop: true,
+            easing: 'easeInOutSine',
+            delay: anime.random(0, 2000)
+        });
+    });
+
     // Footer animations
     anime({
         targets: '.footer-logo, .footer-brand',
@@ -300,26 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loop: true,
             easing: 'easeInOutSine',
             delay: anime.random(0, 2000)
-        });
-    });
-
-    // Button hover effect
-    const button = document.querySelector('.cta-button');
-    button.addEventListener('mouseenter', () => {
-        anime({
-            targets: button,
-            scale: 1.05,
-            duration: 300,
-            easing: 'easeOutExpo'
-        });
-    });
-
-    button.addEventListener('mouseleave', () => {
-        anime({
-            targets: button,
-            scale: 1,
-            duration: 300,
-            easing: 'easeOutExpo'
         });
     });
 }); 
