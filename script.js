@@ -73,6 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const rose = document.querySelector('.rose');
     const petals = document.querySelectorAll('.petal');
 
+    // Create petals dynamically
+    const petalCount = 17;
+    rose.innerHTML = '';
+    for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        rose.appendChild(petal);
+    }
+
     // Initial petal animation
     anime({
         targets: '.petal',
@@ -97,7 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
             { value: 1, duration: 2000, delay: anime.stagger(100) }
         ],
         easing: 'easeOutElastic(1, .6)',
-        loop: false
+        complete: function(anim) {
+            // Start continuous rotation after initial animation
+            anime({
+                targets: '.rose',
+                rotateY: [0, 360],
+                duration: 20000,
+                easing: 'linear',
+                loop: true
+            });
+        }
     });
 
     // Continuous floating animation for the rose container
@@ -180,8 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
     testimonialCards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
-        
-        // Hover effect
+        setTimeout(() => {
+            testimonialObserver.observe(card);
+        }, index * 100);
+
+        // Add hover effect
         card.addEventListener('mouseenter', () => {
             anime({
                 targets: card,
@@ -201,49 +222,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 easing: 'easeOutQuad'
             });
         });
-
-        setTimeout(() => {
-            testimonialObserver.observe(card);
-        }, index * 100);
     });
 
     // Background particles
     const createParticles = () => {
-        const particles = [];
+        const container = document.createElement('div');
+        container.className = 'particles-container';
+        container.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        document.body.appendChild(container);
+
         for (let i = 0; i < 30; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             particle.style.cssText = `
-                position: fixed;
+                position: absolute;
                 width: 2px;
                 height: 2px;
                 background: rgba(255, 255, 255, ${Math.random() * 0.15});
                 border-radius: 50%;
                 left: ${Math.random() * 100}vw;
                 top: ${Math.random() * 100}vh;
-                pointer-events: none;
             `;
-            document.body.appendChild(particle);
-            particles.push(particle);
-        }
+            container.appendChild(particle);
 
-        // Particle animations
-        particles.forEach(particle => {
             anime({
                 targets: particle,
-                translateX: function() {
-                    return anime.random(-100, 100);
-                },
-                translateY: function() {
-                    return anime.random(-100, 100);
-                },
+                translateX: () => anime.random(-100, 100),
+                translateY: () => anime.random(-100, 100),
                 opacity: [0, 0.15, 0],
                 duration: anime.random(4000, 7000),
                 loop: true,
                 easing: 'easeInOutSine',
                 delay: anime.random(0, 2000)
             });
-        });
+        }
     };
 
     createParticles();
