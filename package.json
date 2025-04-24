@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "browser-sync start --server --no-notify --directory --files '**/*.js' '**/*.css' '**/*.html'",
-    "build": "cp -r . dist/",
-    "vercel-build": "npm run build"
+    "build": "./build.sh",
+    "start": "browser-sync start --server --no-notify --directory"
   },
   "dependencies": {
     "animejs": "^4.0.1"
