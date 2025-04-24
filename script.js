@@ -1,4 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Header animations
+    anime({
+        targets: '.logo',
+        opacity: [0, 1],
+        translateY: [-20, 0],
+        duration: 1000,
+        easing: 'easeOutExpo'
+    });
+
+    anime({
+        targets: '.nav-link',
+        opacity: [0, 1],
+        translateY: [-20, 0],
+        delay: anime.stagger(100),
+        duration: 800,
+        easing: 'easeOutExpo'
+    });
+
+    anime({
+        targets: '.header-actions > *',
+        opacity: [0, 1],
+        translateY: [-20, 0],
+        delay: anime.stagger(100, {start: 400}),
+        duration: 800,
+        easing: 'easeOutExpo'
+    });
+
+    // Add scroll effect to header
+    let lastScroll = 0;
+    const header = document.querySelector('.main-header');
+    
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll <= 0) {
+            header.style.boxShadow = 'none';
+        } else {
+            header.style.boxShadow = '0 2px 20px rgba(0,0,0,0.3)';
+        }
+        
+        lastScroll = currentScroll;
+    });
+
     // Initial animations
     anime({
         targets: '.title',
