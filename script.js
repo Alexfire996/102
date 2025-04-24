@@ -155,19 +155,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Testimonial cards animation
+    // Testimonial cards animation with Intersection Observer
     const testimonialCards = document.querySelectorAll('.testimonial-card');
-    testimonialCards.forEach((card, index) => {
-        // Initial fade in
-        anime({
-            targets: card,
-            opacity: [0, 1],
-            translateY: [50, 0],
-            duration: 1000,
-            delay: 500 + (index * 200),
-            easing: 'easeOutQuad'
-        });
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
+    const testimonialObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                anime({
+                    targets: entry.target,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 800,
+                    easing: 'easeOutExpo'
+                });
+                testimonialObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    testimonialCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
         // Hover effect
         card.addEventListener('mouseenter', () => {
             anime({
@@ -188,44 +201,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 easing: 'easeOutQuad'
             });
         });
+
+        setTimeout(() => {
+            testimonialObserver.observe(card);
+        }, index * 100);
     });
 
     // Background particles
-    const particles = [];
-    for (let i = 0; i < 30; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.cssText = `
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, ${Math.random() * 0.15});
-            border-radius: 50%;
-            left: ${Math.random() * 100}vw;
-            top: ${Math.random() * 100}vh;
-            pointer-events: none;
-        `;
-        document.body.appendChild(particle);
-        particles.push(particle);
-    }
+    const createParticles = () => {
+        const particles = [];
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.cssText = `
+                position: fixed;
+                width: 2px;
+                height: 2px;
+                background: rgba(255, 255, 255, ${Math.random() * 0.15});
+                border-radius: 50%;
+                left: ${Math.random() * 100}vw;
+                top: ${Math.random() * 100}vh;
+                pointer-events: none;
+            `;
+            document.body.appendChild(particle);
+            particles.push(particle);
+        }
 
-    // Particle animations
-    particles.forEach(particle => {
-        anime({
-            targets: particle,
-            translateX: function() {
-                return anime.random(-100, 100);
-            },
-            translateY: function() {
-                return anime.random(-100, 100);
-            },
-            opacity: [0, 0.15, 0],
-            duration: anime.random(4000, 7000),
-            loop: true,
-            easing: 'easeInOutSine',
-            delay: anime.random(0, 2000)
+        // Particle animations
+        particles.forEach(particle => {
+            anime({
+                targets: particle,
+                translateX: function() {
+                    return anime.random(-100, 100);
+                },
+                translateY: function() {
+                    return anime.random(-100, 100);
+                },
+                opacity: [0, 0.15, 0],
+                duration: anime.random(4000, 7000),
+                loop: true,
+                easing: 'easeInOutSine',
+                delay: anime.random(0, 2000)
+            });
         });
-    });
+    };
+
+    createParticles();
 
     // Footer animations
     anime({
@@ -286,73 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 300,
                 easing: 'easeOutQuad'
             });
-        });
-    });
-
-    // Testimonial cards animation
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const testimonialObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                anime({
-                    targets: entry.target,
-                    opacity: [0, 1],
-                    translateY: [20, 0],
-                    duration: 800,
-                    easing: 'easeOutExpo'
-                });
-                testimonialObserver.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    testimonialCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            testimonialObserver.observe(card);
-        }, index * 100);
-    });
-
-    // Background particles
-    const particles = [];
-    for (let i = 0; i < 30; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.cssText = `
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, ${Math.random() * 0.15});
-            border-radius: 50%;
-            left: ${Math.random() * 100}vw;
-            top: ${Math.random() * 100}vh;
-            pointer-events: none;
-        `;
-        document.body.appendChild(particle);
-        particles.push(particle);
-    }
-
-    // Particle animations
-    particles.forEach(particle => {
-        anime({
-            targets: particle,
-            translateX: function() {
-                return anime.random(-100, 100);
-            },
-            translateY: function() {
-                return anime.random(-100, 100);
-            },
-            opacity: [0, 0.15, 0],
-            duration: anime.random(4000, 7000),
-            loop: true,
-            easing: 'easeInOutSine',
-            delay: anime.random(0, 2000)
         });
     });
 }); 
